@@ -3,7 +3,7 @@ package com.krakedev.inventarios.entidades;
 public class Proveedor {
 
 	private String provIdentificador;
-	private String catIdTipodoc;
+	private CatalogoTipoDocumentos tipoDocumento;
 	private String provNombre;
 	private String provTelefono;
 	private String provCorreo;
@@ -13,11 +13,11 @@ public class Proveedor {
 
 	}
 
-	public Proveedor(String provIdentificador, String catIdTipodoc, String provNombre, String provTelefono,
-			String provCorreo, String provDireccion) {
+	public Proveedor(String provIdentificador, CatalogoTipoDocumentos tipoDocumento, String provNombre,
+			String provTelefono, String provCorreo, String provDireccion) {
 		super();
 		this.provIdentificador = provIdentificador;
-		this.catIdTipodoc = catIdTipodoc;
+		this.tipoDocumento = tipoDocumento;
 		this.provNombre = provNombre;
 		this.provTelefono = provTelefono;
 		this.provCorreo = provCorreo;
@@ -32,12 +32,12 @@ public class Proveedor {
 		this.provIdentificador = provIdentificador;
 	}
 
-	public String getCatIdTipodoc() {
-		return catIdTipodoc;
+	public CatalogoTipoDocumentos getTipoDocumento() {
+		return tipoDocumento;
 	}
 
-	public void setCatIdTipodoc(String catIdTipodoc) {
-		this.catIdTipodoc = catIdTipodoc;
+	public void setTipoDocumento(CatalogoTipoDocumentos tipoDocumento) {
+		this.tipoDocumento = tipoDocumento;
 	}
 
 	public String getProvNombre() {
@@ -74,9 +74,9 @@ public class Proveedor {
 
 	@Override
 	public String toString() {
-		return "Proveedor [provIdentificador=" + provIdentificador + ", catIdTipodoc=" + catIdTipodoc + ", provNombre="
-				+ provNombre + ", provTelefono=" + provTelefono + ", provCorreo=" + provCorreo + ", provDireccion="
-				+ provDireccion + "]";
+		return "Proveedor [provIdentificador=" + provIdentificador + ", tipoDocumento=" + tipoDocumento
+				+ ", provNombre=" + provNombre + ", provTelefono=" + provTelefono + ", provCorreo=" + provCorreo
+				+ ", provDireccion=" + provDireccion + "]";
 	}
 
 }

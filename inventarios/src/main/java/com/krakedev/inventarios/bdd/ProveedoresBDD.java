@@ -24,20 +24,24 @@ public class ProveedoresBDD {
 		try {
 			con = ConexionBDD.obtenerConexion();
 			ps = con.prepareStatement(
-					"select prov_identificador,cat_id_tipodoc,prov_nombre,prov_telefono, prov_correo, prov_direccion "
-							+ "from proveedores " + "where upper(prov_nombre) like ?");
+					"select prov_identificador,cat_doc.cat_id_tipodoc,cat_doc.cat_nombre,prov_nombre,prov_telefono, prov_correo, prov_direccion "
+					+ "from proveedores, catalogo_tipo_documentos as cat_doc where proveedores.cat_id_tipodoc = cat_doc.cat_id_tipodoc "
+					+ "and upper(prov_nombre) like ?");
 			ps.setString(1, "%" + subcadena.toUpperCase() + "%"); // Convierto a mayusculas
 			rs = ps.executeQuery();
 
 			while (rs.next()) {
+				
 				String identificador = rs.getString("prov_identificador");
-				String tipoDocumento = rs.getString("cat_id_tipodoc");
+				String codigoTipoDocumento = rs.getString("cat_id_tipodoc");
+				String nombreTipoDocumento = rs.getString("cat_nombre");
 				String nombre = rs.getString("prov_nombre");
 				String telefono = rs.getString("prov_telefono");
 				String correo = rs.getString("prov_correo");
 				String direccion = rs.getString("prov_direccion");
-
-				proveedor = new Proveedor(identificador, tipoDocumento, nombre, telefono, correo, direccion);
+				
+				CatalogoTipoDocumentos td= new CatalogoTipoDocumentos(codigoTipoDocumento,nombreTipoDocumento);
+				proveedor = new Proveedor(identificador, td, nombre, telefono, correo, direccion);
 				proveedores.add(proveedor);
 			}
 
