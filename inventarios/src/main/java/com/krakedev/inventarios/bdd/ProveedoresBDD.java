@@ -204,4 +204,42 @@ public class ProveedoresBDD {
 		return productos;
 	}
 
+	public void insertarProducto(Producto producto) throws KrakeDevException {
+
+		Connection con = null;
+
+		try {
+			con = ConexionBDD.obtenerConexion();
+			PreparedStatement ps = con.prepareStatement(
+					"INSERT INTO producto(prod_nombre, udm_id, prod_precioventa, prod_tieneiva, prod_coste, cat_id_tipoproducto, prod_stock) "
+					+ "	VALUES (?, ?, ?, ?, ?, ?, ?)");
+			ps.setString(1, producto.getProdNombre());
+			ps.setInt(2, producto.getUnidadesMedida().getUdmId());
+			ps.setBigDecimal(3, producto.getProdPrecioVenta());
+			ps.setBoolean(4, producto.isProdTieneIva());
+			ps.setBigDecimal(5, producto.getProdCoste());
+			ps.setInt(6, producto.getCatIdTipoProducto().getCatId());
+			ps.setInt(7, producto.getProdStock());
+
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KrakeDevException("Error al insertar clientes. Detalle: " + e.getMessage());
+		} catch (KrakeDevException e) {
+			// TODO Auto-generated catch block
+			throw e;
+		} finally {
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+	}
 }

@@ -1,0 +1,2 @@
+SELECT setval('producto_prod_id_seq', (SELECT MAX(prod_id) FROM producto) + 1, true);
+SELECT last_value FROM producto_prod_id_seq;
