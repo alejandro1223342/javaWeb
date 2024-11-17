@@ -19,7 +19,7 @@ public class PedidosBDD {
 		Connection con = null;
 		ResultSet rsClave = null;
 		int codigoCabecera = 0;
-		PreparedStatement psDet=null;
+		PreparedStatement psDet = null;
 		try {
 			con = ConexionBDD.obtenerConexion();
 
@@ -42,31 +42,78 @@ public class PedidosBDD {
 
 			ArrayList<DetallePedido> detallesPedido = cabeceraPedido.getDetalles();
 			DetallePedido det;
-			for(int i=0;i<detallesPedido.size();i++) {
+			for (int i = 0; i < detallesPedido.size(); i++) {
 				det = detallesPedido.get(i);
-				psDet=con.prepareStatement("INSERT INTO detalle_pedido( "
+				psDet = con.prepareStatement("INSERT INTO detalle_pedido( "
 						+ "	cabp_id, prod_id, det_cantidadsolicitada, det_subtotal, det_cantidadrecibida) "
 						+ "	VALUES (?, ?, ?, ?, ?)");
-				
+
 				psDet.setInt(1, codigoCabecera);
 				psDet.setInt(2, det.getProdId().getProId());
 				psDet.setInt(3, det.getDetCantidadSolicitada());
 				BigDecimal pv = det.getProdId().getProdPrecioVenta();
 				BigDecimal cantidad = new BigDecimal(det.getDetCantidadSolicitada());
-				BigDecimal subtotal= pv.multiply(cantidad);
+				BigDecimal subtotal = pv.multiply(cantidad);
 				psDet.setBigDecimal(4, subtotal);
 				psDet.setInt(5, 0);
-				
+
 				psDet.executeUpdate();
-				
+
 			}
-			
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new KrakeDevException("Error al insertar clientes. Detalle: " + e.getMessage());
 		} catch (KrakeDevException e) {
 			// TODO Auto-generated catch block
+			throw e;
+		} finally {
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+	}
+
+	public void actualizar(CabeceraPedido cabeceraPedido) throws KrakeDevException {
+
+		Connection con = null;
+
+		try {
+			con = ConexionBDD.obtenerConexion();
+			PreparedStatement ps = con.prepareStatement("update cabecera_pedido set est_cod = ? where cabp_id= ?");
+
+			ps.setString(1, "R");
+			ps.setInt(2, cabeceraPedido.getCabpId());
+			ps.executeUpdate();
+			
+			ArrayList<DetallePedido> detallesPedido = cabeceraPedido.getDetalles();
+			DetallePedido det;
+
+			for (int i = 0; i < detallesPedido.size(); i++) {
+				det = detallesPedido.get(i);
+				
+				PreparedStatement psDetalle = con.prepareStatement(
+						"UPDATE detalle_pedido SET det_cantidadrecibida = ?, det_subtotal = ? WHERE det_id = ?");
+				psDetalle.setInt(1, det.getDetCantidadRecibida()); // Nueva cantidad recibida
+				BigDecimal pv = det.getProdId().getProdPrecioVenta();
+				BigDecimal cantidad = new BigDecimal(det.getDetCantidadRecibida());
+				BigDecimal subtotal = pv.multiply(cantidad);
+				psDetalle.setBigDecimal(2, subtotal); // Nuevo subtotal
+				psDetalle.setInt(3, det.getDetId()); // ID del detalle
+				psDetalle.executeUpdate();
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KrakeDevException("Error al actualizar clientes. Detalle: " + e.getMessage());
+		} catch (KrakeDevException e) {
 			throw e;
 		} finally {
 			if (con != null) {
