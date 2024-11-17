@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.krakedev.inventarios.bdd.ProductosBDD;
 import com.krakedev.inventarios.bdd.ProveedoresBDD;
 import com.krakedev.inventarios.entidades.Producto;
 import com.krakedev.inventarios.entidades.Proveedor;
@@ -24,7 +25,7 @@ public class ServicioProductos {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response buscar(@PathParam("sub")String subcadena) {
 
-		ProveedoresBDD provBDD = new ProveedoresBDD();
+		ProductosBDD provBDD = new ProductosBDD();
 		ArrayList<Producto> productos = null;
 		try {
 			productos = provBDD.buscarP(subcadena);
@@ -43,7 +44,7 @@ public class ServicioProductos {
 	public Response insertar(Producto productos) {
 
 		System.out.println(">>>>" + productos);
-		ProveedoresBDD pro = new ProveedoresBDD();
+		ProductosBDD pro = new ProductosBDD();
 		try {
 			pro.insertarProducto(productos);
 			return Response.ok().build();
