@@ -1,6 +1,7 @@
 package com.krakedev.inventarios.bdd;
 
 import java.math.BigDecimal;
+import java.security.Timestamp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -85,6 +86,10 @@ public class PedidosBDD {
 
 		Connection con = null;
 
+		PreparedStatement psHistorial = null;
+		// Date fechaActual = new Date(); // Fecha actual
+		// Timestamp fechaHoraActual = new Timestamp(fechaActual.getTime());
+
 		try {
 			con = ConexionBDD.obtenerConexion();
 			PreparedStatement ps = con.prepareStatement("update cabecera_pedido set est_cod = ? where cabp_id= ?");
@@ -92,13 +97,13 @@ public class PedidosBDD {
 			ps.setString(1, "R");
 			ps.setInt(2, cabeceraPedido.getCabpId());
 			ps.executeUpdate();
-			
+
 			ArrayList<DetallePedido> detallesPedido = cabeceraPedido.getDetalles();
 			DetallePedido det;
 
 			for (int i = 0; i < detallesPedido.size(); i++) {
 				det = detallesPedido.get(i);
-				
+
 				PreparedStatement psDetalle = con.prepareStatement(
 						"UPDATE detalle_pedido SET det_cantidadrecibida = ?, det_subtotal = ? WHERE det_id = ?");
 				psDetalle.setInt(1, det.getDetCantidadRecibida()); // Nueva cantidad recibida
@@ -108,6 +113,16 @@ public class PedidosBDD {
 				psDetalle.setBigDecimal(2, subtotal); // Nuevo subtotal
 				psDetalle.setInt(3, det.getDetId()); // ID del detalle
 				psDetalle.executeUpdate();
+
+				psHistorial = con.prepareStatement("INSERT INTO public.historial_stock( "
+						+ " his_fecha, his_referencia, prod_id, his_cantidad) " + "	VALUES (?, ?, ?, ?);");
+
+				psHistorial.setDate(1, new java.sql.Date(System.currentTimeMillis()));
+				psHistorial.setString(2, "PEDIDO "+det.getDetId()); // Aquí debes definir la referencia que necesitas
+				psHistorial.setInt(3, det.getProdId().getProId()); // ID del producto
+				psHistorial.setInt(4, det.getDetCantidadRecibida()); // Cantidad recibida
+			    psHistorial.executeUpdate();
+
 			}
 
 		} catch (SQLException e) {
