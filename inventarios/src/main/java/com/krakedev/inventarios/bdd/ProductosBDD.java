@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.krakedev.entidades.Cliente;
 import com.krakedev.inventarios.entidades.Catalogo;
 import com.krakedev.inventarios.entidades.Producto;
 import com.krakedev.inventarios.entidades.UnidadesMedida;
@@ -164,30 +163,50 @@ public class ProductosBDD {
 
 	}
 	
-	public Producto buscarPor(String cedulaBusqueda) throws KrakeDevException {
+	public Producto buscarPorId(int prod_id) throws KrakeDevException {
 
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		Cliente cliente = null;
+		Producto producto = null;
 
 		try {
 			con = ConexionBDD.obtenerConexion();
-			ps = con.prepareStatement("SELECT cedula, nombre, apellido, edad,num_hijos FROM cliente where cedula=?;");
-			ps.setString(1, cedulaBusqueda);
+			ps = con.prepareStatement("select prod_id, prod_nombre, udm_id, cast(prod_precioventa as decimal (5,2)), prod_tieneiva, "
+					+ "	cast(prod_coste as decimal (5,2)), cat_id_tipoproducto, prod_stock "
+					+ "	from producto where prod_id=?");
+			
+			ps.setInt(1, prod_id);
 			rs = ps.executeQuery();
 
 			if (rs.next()) {
-				System.out.println("Existe el cliente");
-				String cedula = rs.getString("cedula");
-				String nombre = rs.getString("nombre");
-				String apellido = rs.getString("apellido");
-				int edad = rs.getInt("edad");
-				int num_hijos = rs.getInt("num_hijos");
+				//System.out.println("Existe el cliente");
+				String prodNombre = rs.getString("prod_nombre");
+				int udmId  = rs.getInt("udm_id");
+				BigDecimal prodPrecioVenta = rs.getBigDecimal("prod_precioventa");
+				boolean prodTieneIva = rs.getBoolean("prod_tieneiva");
+				BigDecimal prodCoste = rs.getBigDecimal("prod_coste");
+				int catTipoProducto = rs.getInt("cat_id_tipoproducto");
+				int prodStock = rs.getInt("prod_stock");
+				
+				UnidadesMedida udm = new UnidadesMedida();
+				udm.setUdmId(udmId);
 
-				cliente = new Cliente(cedula, nombre, apellido, edad,num_hijos);
+				Catalogo catalogo = new Catalogo();
+				catalogo.setCatId(catTipoProducto);
+				
+				producto = new Producto();
+				producto.setProId(prod_id);
+				producto.setProdNombre(prodNombre);
+				producto.setUnidadesMedida(udm);
+				producto.setProdPrecioVenta(prodPrecioVenta);
+				producto.setProdTieneIva(prodTieneIva);
+				producto.setProdCoste(prodCoste);
+				producto.setCatIdTipoProducto(catalogo);
+				producto.setProdStock(prodStock);
+
 			}else {
-				System.out.println("No existe el cliente");
+				System.out.println("No existe el producto");
 			}
 
 		} catch (KrakeDevException e) {
@@ -200,7 +219,7 @@ public class ProductosBDD {
 			throw new KrakeDevException("Error al consultar. Detalle: " + e.getMessage());
 		}
 
-		return cliente;
+		return producto;
 	}
 
 }

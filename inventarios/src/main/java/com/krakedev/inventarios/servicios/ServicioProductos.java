@@ -69,4 +69,23 @@ public class ServicioProductos {
 			return Response.serverError().build();
 		}
 	}
+	
+	@Path("buscarPorId/{prodParam}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response buscarPorId(@PathParam("prodParam") int prod_id) {
+		ProductosBDD pro = new ProductosBDD();
+	    Producto productos = null;
+
+		System.out.println("Ingresa>>>>" + prod_id);
+
+		try {
+			productos = pro.buscarPorId(prod_id);
+			return Response.ok(productos).build();
+		} catch (KrakeDevException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return Response.serverError().build();
+		}
+	}
 }

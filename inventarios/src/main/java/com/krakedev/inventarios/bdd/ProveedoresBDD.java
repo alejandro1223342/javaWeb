@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import com.krakedev.inventarios.entidades.CatalogoTipoDocumentos;
 import com.krakedev.inventarios.entidades.Proveedor;
+import com.krakedev.inventarios.entidades.UnidadesMedida;
 import com.krakedev.inventarios.excepciones.KrakeDevException;
 import com.krakedev.inventarios.utils.ConexionBDD;
 
@@ -95,6 +96,60 @@ public class ProveedoresBDD {
 
 		}
 
+	}
+	
+	
+	public Proveedor buscarPorId(String prov_identificador) throws KrakeDevException {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Proveedor proveedor = null;
+
+		try {
+			con = ConexionBDD.obtenerConexion();
+			ps = con.prepareStatement("SELECT cat_id_tipodoc, prov_nombre, prov_telefono, prov_correo, prov_direccion "
+					+ "	FROM proveedores where prov_identificador = ?");
+			
+			ps.setString(1, prov_identificador);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				//System.out.println("Existe el cliente");
+				String catIdTipoDoc = rs.getString("cat_id_tipodoc");
+				String provNombre  = rs.getString("prov_nombre");
+				String provTelefono = rs.getString("prov_telefono");
+				String provCorreo = rs.getString("prov_correo");
+				String provDireccion = rs.getString("prov_direccion");
+				
+
+				CatalogoTipoDocumentos catalogoDoc = new CatalogoTipoDocumentos();
+				catalogoDoc.setCatIdTipoDc(catIdTipoDoc);
+				
+				proveedor = new Proveedor();
+				proveedor.setProvIdentificador(prov_identificador);
+				proveedor.setTipoDocumento(catalogoDoc);
+				proveedor.setProvNombre(provNombre);
+				proveedor.setProvTelefono(provTelefono);
+				proveedor.setProvCorreo(provCorreo);
+				proveedor.setProvDireccion(provDireccion);
+				
+
+			}else {
+				System.out.println("No existe el producto");
+			}
+
+		} catch (KrakeDevException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw e;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new KrakeDevException("Error al consultar. Detalle: " + e.getMessage());
+		}
+
+		return proveedor;
 	}
 
 	

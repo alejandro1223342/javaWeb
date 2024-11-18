@@ -11,7 +11,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.krakedev.inventarios.bdd.ProductosBDD;
 import com.krakedev.inventarios.bdd.ProveedoresBDD;
+import com.krakedev.inventarios.entidades.Producto;
 import com.krakedev.inventarios.entidades.Proveedor;
 import com.krakedev.inventarios.excepciones.KrakeDevException;
 
@@ -51,5 +53,24 @@ public class ServiciosProveedores {
 			return Response.serverError().build();
 		}
 
+	}
+	
+	@Path("buscarPorId/{provParam}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response buscarPorId(@PathParam("provParam") String prov_id) {
+		ProveedoresBDD prov = new ProveedoresBDD();
+	    Proveedor proveedor = null;
+
+		System.out.println("Ingresa>>>>" + prov_id);
+
+		try {
+			proveedor = prov.buscarPorId(prov_id);
+			return Response.ok(proveedor).build();
+		} catch (KrakeDevException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return Response.serverError().build();
+		}
 	}
 }
