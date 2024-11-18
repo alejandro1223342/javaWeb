@@ -59,11 +59,11 @@ public class ServicioCatalogos {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response obtenerDocumentos() {
-		TipoDocumentoBDD catalogoDoc = new TipoDocumentoBDD();
-		ArrayList<CatalogoTipoDocumentos> tipoDoc = null;
+		CatalogoBDD catalogo = new CatalogoBDD();
+		ArrayList<Catalogo> catTipo = null;
 		try {
-			tipoDoc = catalogoDoc.recuperarTodos();
-			return Response.ok(tipoDoc).build();
+			catTipo = catalogo.recuperarTodos();
+			return Response.ok(catTipo).build();
 		} catch (KrakeDevException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

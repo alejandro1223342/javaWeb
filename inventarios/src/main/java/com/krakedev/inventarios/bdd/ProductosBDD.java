@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.krakedev.entidades.Cliente;
 import com.krakedev.inventarios.entidades.Catalogo;
 import com.krakedev.inventarios.entidades.Producto;
 import com.krakedev.inventarios.entidades.UnidadesMedida;
@@ -161,6 +162,45 @@ public class ProductosBDD {
 
 		}
 
+	}
+	
+	public Producto buscarPor(String cedulaBusqueda) throws KrakeDevException {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Cliente cliente = null;
+
+		try {
+			con = ConexionBDD.obtenerConexion();
+			ps = con.prepareStatement("SELECT cedula, nombre, apellido, edad,num_hijos FROM cliente where cedula=?;");
+			ps.setString(1, cedulaBusqueda);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				System.out.println("Existe el cliente");
+				String cedula = rs.getString("cedula");
+				String nombre = rs.getString("nombre");
+				String apellido = rs.getString("apellido");
+				int edad = rs.getInt("edad");
+				int num_hijos = rs.getInt("num_hijos");
+
+				cliente = new Cliente(cedula, nombre, apellido, edad,num_hijos);
+			}else {
+				System.out.println("No existe el cliente");
+			}
+
+		} catch (KrakeDevException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw e;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new KrakeDevException("Error al consultar. Detalle: " + e.getMessage());
+		}
+
+		return cliente;
 	}
 
 }

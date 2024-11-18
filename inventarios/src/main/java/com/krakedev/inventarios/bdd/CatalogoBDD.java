@@ -88,40 +88,47 @@ public class CatalogoBDD {
 		}
 
 	}
-	
-	public class TipoDocumentoBDD {
-		public ArrayList<CatalogoTipoDocumentos> recuperarTodos() throws KrakeDevException {
-			ArrayList<CatalogoTipoDocumentos> catalagoDoc = new ArrayList<CatalogoTipoDocumentos>();
 
-			Connection con = null;
-			PreparedStatement ps = null;
-			ResultSet rs = null;
-			CatalogoTipoDocumentos catDoc = null;
+	public ArrayList<Catalogo> recuperarTodos() throws KrakeDevException {
+		ArrayList<Catalogo> catalago = new ArrayList<Catalogo>();
 
-			try {
-				con = ConexionBDD.obtenerConexion();
-				ps = con.prepareStatement("select cat_id_tipodoc,cat_nombre from catalogo_tipo_documentos ");
-				rs = ps.executeQuery();
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Catalogo cat = null;
 
-				while (rs.next()) {
-					String tipoDoc = rs.getString("cat_id_tipodoc");
-					String nombre = rs.getString("cat_nombre");
+		try {
+			con = ConexionBDD.obtenerConexion();
+			ps = con.prepareStatement("select cat_id,cat_nombre,cat_descripcion,cat_padre from catalogo");
+			rs = ps.executeQuery();
 
-					catDoc = new CatalogoTipoDocumentos(tipoDoc, nombre);
-					catalagoDoc.add(catDoc);
-				}
+			while (rs.next()) {
+				int catId = rs.getInt("cat_id");
+				String catNombre = rs.getString("cat_nombre");
+				String catDes = rs.getString("cat_descripcion");
+				int catPadre = rs.getInt("cat_padre");
 
-			} catch (KrakeDevException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				throw e;
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				throw new KrakeDevException("Error al consultar. Detalle: " + e.getMessage());
+				Catalogo catalo = new Catalogo();
+				catalo.setCatId(catId);
+				catalo.setCatNombre(catNombre);
+				catalo.setCatDescripcion(catDes);
+
+				
+				cat = new Catalogo(catId, catNombre,catDes,catalo);
+				catalago.add(cat);
 			}
 
-			return catalagoDoc;
+		} catch (KrakeDevException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw e;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new KrakeDevException("Error al consultar. Detalle: " + e.getMessage());
 		}
+
+		return catalago;
 	}
+
 }
