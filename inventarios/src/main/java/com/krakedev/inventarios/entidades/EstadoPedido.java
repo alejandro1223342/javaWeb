@@ -2,24 +2,24 @@ package com.krakedev.inventarios.entidades;
 
 public class EstadoPedido {
 
-	private int estCod;
+	private String estCod;
 	private String estDescripcion;
 
 	public EstadoPedido() {
 		super();
 	}
 
-	public EstadoPedido(int estCod, String estDescripcion) {
+	public EstadoPedido(String estCod, String estDescripcion) {
 		super();
 		this.estCod = estCod;
 		this.estDescripcion = estDescripcion;
 	}
 
-	public int getEstCod() {
+	public String getEstCod() {
 		return estCod;
 	}
 
-	public void setEstCod(int estCod) {
+	public void setEstCod(String estCod) {
 		this.estCod = estCod;
 	}
 

@@ -1,7 +1,6 @@
 package com.krakedev.inventarios.bdd;
 
 import java.math.BigDecimal;
-import java.security.Timestamp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,7 +9,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.krakedev.inventarios.entidades.CabeceraPedido;
+import com.krakedev.inventarios.entidades.Catalogo;
 import com.krakedev.inventarios.entidades.DetallePedido;
+import com.krakedev.inventarios.entidades.EstadoPedido;
+import com.krakedev.inventarios.entidades.Producto;
+import com.krakedev.inventarios.entidades.UnidadesMedida;
 import com.krakedev.inventarios.excepciones.KrakeDevException;
 import com.krakedev.inventarios.utils.ConexionBDD;
 
@@ -143,5 +146,105 @@ public class PedidosBDD {
 		}
 
 	}
+	
+	
+	public ArrayList<DetallePedido> buscarPorProveedor(String proveedor) throws KrakeDevException {
+	    ArrayList<DetallePedido> pedidos = new ArrayList<>();
+
+	    Connection con = null;
+	    PreparedStatement ps = null;
+	    ResultSet rs = null;
+
+	    try {
+	        con = ConexionBDD.obtenerConexion();
+	        ps = con.prepareStatement("select detalle_pedido.det_id,detalle_pedido.cabp_id, "
+	                + "cabecera_pedido.cabp_fecha, estado_pedidos.est_cod, estado_pedidos.est_descripcion, "
+	                + "producto.prod_nombre, unidades_medida.udm_nombre, unidades_medida.udm_descripcion, "
+	                + "cast(producto.prod_precioventa as decimal(6,2)),producto.prod_tieneiva,cast(producto.prod_coste as decimal (6,2)),catalogo.cat_nombre, "
+	                + "producto.prod_stock,detalle_pedido.det_cantidadsolicitada,cast(detalle_pedido.det_subtotal as decimal(6,2)), "
+	                + "detalle_pedido.det_cantidadrecibida "
+	                + "from detalle_pedido, cabecera_pedido, producto, estado_pedidos, "
+	                + "unidades_medida, catalogo "
+	                + "where detalle_pedido.cabp_id = cabecera_pedido.cabp_id "
+	                + "and detalle_pedido.prod_id = producto.prod_id "
+	                + "and estado_pedidos.est_cod = cabecera_pedido.est_cod "
+	                + "and unidades_medida.udm_id = producto.udm_id "
+	                + "and catalogo.cat_id = producto.cat_id_tipoproducto "
+	                + "and cabecera_pedido.prov_identificador = ?");
+	        ps.setString(1, proveedor);
+	        rs = ps.executeQuery();
+
+	        while (rs.next()) {
+	            // Recuperar los valores del ResultSet
+	            int detId = rs.getInt("det_id");
+	            int cabpId = rs.getInt("cabp_id");
+	            Date cabpFecha = rs.getDate("cabp_fecha");
+	            String estCod = rs.getString("est_cod");
+	            String estDesc = rs.getString("est_descripcion");
+	            String prodNombre = rs.getString("prod_nombre");
+	            String udmNombre = rs.getString("udm_nombre");
+	            String udmDesc = rs.getString("udm_descripcion");
+	            BigDecimal prodPrecioVenta = rs.getBigDecimal("prod_precioventa");
+	            Boolean prodTieneIva = rs.getBoolean("prod_tieneiva");
+	            BigDecimal prodCoste = rs.getBigDecimal("prod_coste");
+	            String catNombre = rs.getString("cat_nombre");
+	            int prodStock = rs.getInt("prod_stock");
+	            int detCantidadSoli=rs.getInt("det_cantidadsolicitada");
+	            BigDecimal detSubtotal = rs.getBigDecimal("det_subtotal");
+	            int detCantidadReci=rs.getInt("det_cantidadrecibida");
+
+	            // Crear objetos relacionados
+	            CabeceraPedido cabp = new CabeceraPedido();
+	            cabp.setCabpId(cabpId);
+	            
+	            EstadoPedido estadoP = new EstadoPedido();
+	            estadoP.setEstCod(estCod);
+	            estadoP.setEstDescripcion(estDesc);
+
+	            UnidadesMedida catUnidadM = new UnidadesMedida();
+	            catUnidadM.setUdmNombre(udmNombre);
+	            catUnidadM.setUdmDescripcion(udmDesc);
+
+	            Catalogo catalogo = new Catalogo();
+	            catalogo.setCatNombre(catNombre);
+	            
+	            Producto producto = new Producto();
+	            producto.setProdNombre(prodNombre);
+	            
+	            
+
+	            // Crear el objeto CabeceraPedido y asignar los valores
+	            DetallePedido detalleP = new DetallePedido();
+	            detalleP.setDetId(detId);
+	            detalleP.setCabpId(cabp);
+	            detalleP.setProdId(producto);
+	            detalleP.setDetCantidadSolicitada(detCantidadSoli);
+	            detalleP.setDetSubtotal(detSubtotal);
+	            detalleP.setDetCantidadRecibida(detCantidadReci);
+	            
+	            pedidos.add(detalleP);
+	        }
+
+	    } catch (KrakeDevException e) {
+	        e.printStackTrace();
+	        throw e;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        throw new KrakeDevException("Error al consultar. Detalle: " + e.getMessage());
+	    } finally {
+	        // Cerrar los recursos en el bloque finally
+	    	if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+	    }
+
+	    return pedidos;
+	}
+
 
 }
