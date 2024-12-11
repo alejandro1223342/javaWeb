@@ -44,4 +44,40 @@ public class TipoDocumentoBDD {
 
 		return catalagoDoc;
 	}
+	
+	public void insertarTipoDocumento(CatalogoTipoDocumentos tipoDocumento) throws KrakeDevException {
+
+		Connection con = null;
+
+		try {
+			con = ConexionBDD.obtenerConexion();
+			PreparedStatement ps = con.prepareStatement(
+					"INSERT INTO catalogo_tipo_documentos (cat_id_tipodoc, cat_nombre) VALUES (?, ?)");
+			ps.setString(1, tipoDocumento.getCatIdTipoDc());
+			ps.setString(2, tipoDocumento.getCatNombre());
+			
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KrakeDevException("Error al insertar Tipo Documento. Detalle: " + e.getMessage());
+		} catch (KrakeDevException e) {
+			// TODO Auto-generated catch block
+			throw e;
+		} finally {
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+	}
+	
+	
+	
 }
